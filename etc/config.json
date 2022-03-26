@@ -18,7 +18,7 @@
                 "network": "ws",
                 "allowInsecure": false,
                 "wsSettings": {
-                  "path": "/cdn"
+                  "path": "/$VMESS"
                 }
             },
             "sniffing": {
@@ -44,7 +44,7 @@
                 "network": "ws",
                 "allowInsecure": false,
                 "wsSettings": {
-                  "path": "/media-cdn"
+                  "path": "/$TROJAN"
                 }
             },
             "sniffing": {
