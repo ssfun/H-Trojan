@@ -1,0 +1,128 @@
+{
+    "log": {
+        "loglevel": "none"
+    },
+    "inbounds": [
+        {   
+            "listen": "/etc/caddy/vmess",
+            "protocol": "vmess",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "$AUUID"
+                    }
+                ],
+                "disableInsecureEncryption": true
+            },
+            "streamSettings": {
+                "network": "ws",
+                "allowInsecure": false,
+                "wsSettings": {
+                  "path": "/cdn"
+                }
+            },
+            "sniffing": {
+                "enabled": true,
+                "destOverride": [
+                    "http",
+                    "tls"
+                ]
+            }
+        },
+        {   
+            "listen": "/etc/caddy/trojan",
+            "protocol": "trojan",
+            "settings": {
+                "clients": [
+                    {
+                        "password":"$PASS",
+                        "level": 0                    }
+                ],
+                "decryption": "none"
+            },
+            "streamSettings": {
+                "network": "ws",
+                "allowInsecure": false,
+                "wsSettings": {
+                  "path": "/media-cdn"
+                }
+            },
+            "sniffing": {
+                "enabled": true,
+                "destOverride": [
+                    "http",
+                    "tls"
+                ]
+            }
+        }
+    ],
+    "routing": {
+        "domainStrategy": "IPIfNonMatch",
+        "domainMatcher": "mph",
+        "rules": [
+           {
+              "type": "field",
+              "protocol": [
+                 "bittorrent"
+              ],
+              "domains": [
+                  "geosite:cn",
+                  "geosite:category-ads-all"
+              ],
+              "outboundTag": "blocked"
+           },
+           {
+              "type": "field",
+              "outboundTag":
+                  "sockstor",
+                  "domains": [
+                      "geosite:tor"
+                  ]
+           },
+           {
+              "type": "field",
+              "outboundTag": "blocked",
+              "domains": [
+                  "geosite:category-ads-all"
+              ]
+           }
+        ]
+    },
+    "outbounds": [
+        {
+            "protocol": "freedom",
+            "settings": {
+                "domainStrategy": "UseIPv4",
+                "userLevel": 0
+            }
+        },
+        {
+            "protocol": "blackhole",
+            "tag": "blocked"
+        },
+        {
+            "protocol": "socks",
+            "tag": "sockstor",
+            "settings": {
+                "servers": [
+                    {
+                        "address": "127.0.0.1",
+                        "port": 9050
+                    }
+                ]
+            }
+        }
+    ],
+    "dns": {
+        "servers": [
+            {
+                "address": "https+local://dns.google/dns-query",
+                "address": "https+local://cloudflare-dns.com/dns-query",
+                "skipFallback": true
+            }
+        ],
+        "queryStrategy": "UseIPv4",
+        "disableCache": true,
+        "disableFallbackIfMatch": false
+    }
+}
